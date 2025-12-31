@@ -1,5 +1,8 @@
-import { pin, Category } from "../types";
+//what I learn ?
+//basically all operation related in localstorage write in one place
+//type declaration 
 
+import { pin, Category } from "../types";
 
 export const getCurrentUser = () => {
   const user = localStorage.getItem("currentUser");

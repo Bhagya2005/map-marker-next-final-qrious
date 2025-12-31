@@ -1,21 +1,34 @@
-import {useEffect,useState} from "react";
-import {PinFormProps,pin} from "../types";
+//What I Learn ?
+//spred Operator , Synthesis Form Event type like React.FormEvent
+//used OR operator in setFormData
 
-export default function PinForm({pin,categories,onSave,onClose}:PinFormProps){
-  const [formData , setFormData] = useState<pin>(pin);
+import { useEffect, useState } from "react";
+import { PinFormProps, pin } from "../types";
+
+export default function PinForm({
+  pin,
+  categories,
+  onSave,
+  onClose,
+}: PinFormProps) {
+  const [formData, setFormData] = useState<pin>(pin);
 
   useEffect(() => {
-    setFormData(pin);
-  },[pin]);
+    if (categories.length === 0) return;
+
+    setFormData(prev => ({
+      ...prev,
+      category: prev.category || categories[0].name, // ✅ force valid category
+    }));
+  }, [categories]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formData);
     onClose();
   };
-  
 
- return (
+  return (
     <div className="form-overlay">
       <div className="form-popup">
         <form onSubmit={handleSubmit}>
@@ -41,12 +54,15 @@ export default function PinForm({pin,categories,onSave,onClose}:PinFormProps){
 
           <select
             value={formData.category}
+            required
             onChange={(e) =>
               setFormData({ ...formData, category: e.target.value })
             }
           >
             {categories.map((c) => (
-              <option key={c.name}>{c.name}</option>
+              <option key={c.name} value={c.name}>
+                {c.name}
+              </option>
             ))}
           </select>
 

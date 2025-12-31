@@ -1,3 +1,7 @@
+//what I learn ? 
+//some small methods like to trim() email and converted into lowwercase
+//router.push() -> for navigate user  [useRouter()]
+
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

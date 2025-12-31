@@ -1,8 +1,13 @@
+//What I Learn ?
+//use of e.stopPropogation()
+//Type assertion in color
+// In leaflet FlyTo configuration in Leaflet
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SidebarProps,NewCategory } from "../types";
 
-export default function Sidebar({pins,selectedPin,onSelectPin,onDeletePin,onEditPin,filter,setFilter,cursorLocation,categories,onAddCategory,mapRef,userEmail}: SidebarProps) {
+export default function Sidebar({pins,selectedPin,onSelectPin,onDeletePin,onEditPin,filter,setFilter,cursorLocation,categories,onAddCategory,mapRef,userEmail,onDeleteCategory}: SidebarProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showCatForm, setShowCatForm] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -13,21 +18,28 @@ export default function Sidebar({pins,selectedPin,onSelectPin,onDeletePin,onEdit
   });
 
   const router = useRouter();
+  
+  const handleAddCategory = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
 
-  const handleAddCategory = (e: React.FormEvent) => {
-    e.preventDefault();
+      const formData = new FormData(e.currentTarget);
+      const color = formData.get("color") as string;
 
-    if (!newCat.name.trim()) return;
+      if (!newCat.name.trim()) return;
 
-    onAddCategory(newCat);
+      onAddCategory({
+        name: newCat.name,
+        color,
+      });
 
-    setNewCat({ name: "", color: "#000000" });
-    setShowCatForm(false);
-  };
+      setNewCat({ name: "", color });
+      setShowCatForm(false);
+    };
+
 
   const handleDeleteCategory = (name: string) => {
-    setFilter("All");
-    alert("Category delete logic parent me move karo");
+  setFilter("All");
+  onDeleteCategory(name);
   };
 
   
@@ -132,6 +144,7 @@ export default function Sidebar({pins,selectedPin,onSelectPin,onDeletePin,onEdit
 
             <input
               type="color"
+              name="color"
               value={newCat.color}
               onChange={(e) =>
                 setNewCat({ ...newCat, color: e.target.value })

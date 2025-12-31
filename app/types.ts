@@ -1,3 +1,6 @@
+//what I learn ?
+//All types are declared in one file which method usefull to declare type in one file and easier Debugg for complex Project
+
 import type { Map as LeafletMap } from "leaflet";
 
 export type pin = {
@@ -45,6 +48,7 @@ export type SidebarProps = {
   cursorLocation: { lat: number; lng: number } | null;
   categories: Category[];
   onAddCategory: (cat: NewCategory) => void;
+  onDeleteCategory: (name: string) => void;
   mapRef: React.MutableRefObject<LeafletMap | null>;
   userEmail:string;
 };

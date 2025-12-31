@@ -1,3 +1,9 @@
+//What I Learn ?
+//for find latlng I use useMapEvent and inside this use onMapClick or onMouseMove
+//how to set Leaflet configuration
+// MapContainer -> TileLayer -> MapClickHandler -> MapMouseMoveHandler
+//In typeScript how to add type in function
+
 import {MapContainer,TileLayer,Marker,Popup,useMap,useMapEvent} from "react-leaflet";
 import { LeafletMouseEvent } from "leaflet";
 import L from "leaflet";
@@ -44,7 +50,6 @@ const getColoredIcon = (color: string) =>
       });
       return null;
     }
-
 
     function PinMarker({
       pin,

@@ -1,3 +1,7 @@
+//what I learn ?
+//Email validation using Reg 
+//crypto.randomUUID()  to generate Id
+
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -48,6 +52,17 @@ export default function Register() {
       email: normalizedEmail,
       password,
     };
+
+    //agar http://localhost:3000/sign-up se register kare to koi error nahi aa rahi hai
+    //but http://192.168.29.115:3000/sign-up se register kare to crypto.randomUUID() me Error aa rahi hai
+
+    // page.tsx:47 Uncaught TypeError: crypto.randomUUID is not a function
+    // at handleRegister (page.tsx:47:18)
+    // handleRegister	@	page.tsx:47
+    // <button>		
+    // Register	@	page.tsx:82
+    // "use client"		
+    // Function.all	@	VM83 <anonymous>:1
 
     users.push(newUser);
 

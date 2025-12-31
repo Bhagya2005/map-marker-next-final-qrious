@@ -52,9 +52,15 @@ export default function HomePage() {
 
   const handleSavePin = (p: pin) => {
     const cat = categories.find(c => c.name === p.category);
-    const finalPin = {
+    
+    if (!cat) {
+      alert("Please select a valid category");
+      return;
+    }
+
+    const finalPin:pin = {
       ...p,
-      color: cat?.color || "#ff0000",
+      color: cat.color, 
       userId: user.email,
     };
 
@@ -66,6 +72,13 @@ export default function HomePage() {
 
     setFormOpen(false);
     setFormData(null);
+  };
+
+  const handleDeleteCategory = (name: string) => {
+    setCategories(prev => prev.filter(c => c.name !== name));
+    setPins(prev => prev.filter(p => p.category !== name));
+
+    if (filter === name) setFilter("All");
   };
 
   const filteredPins =
@@ -91,6 +104,7 @@ export default function HomePage() {
         onAddCategory={(c) =>
           setCategories(prev => [...prev, { ...c, userId: user.email }])
         }
+        onDeleteCategory={handleDeleteCategory}
         mapRef={mapRef}
       />
 
@@ -98,18 +112,24 @@ export default function HomePage() {
         pins={filteredPins}
         mapRef={mapRef}
         setSelectedPin={setSelectedPin}
-        onMapClick={(lat, lng) =>
-          openForm({
-            id: Date.now().toString(),
-            name: "",
-            description: "",
-            lat,
-            lng,
-            category: "General",
-            color: "#ff0000",
-            userId: user.email,
-          })
-        }
+        onMapClick={(lat, lng) => {
+            if (!categories || categories.length === 0) {
+              alert("Please create a category first!");
+              return; 
+            }
+
+            openForm({
+              id: Date.now().toString(),
+              name: "",
+              description: "",
+              lat,
+              lng,
+              category: categories[0].name,
+              color: categories[0].color,   
+              userId: user.email,
+            });
+          }}
+
         onMouseMove={(lat, lng) =>
           setCursorLocation({ lat, lng })
         }

@@ -7,7 +7,7 @@ import PinForm from "./_components/PinForm";
 import { pin, Category } from "./types";
 import type { Map as LeafletMap } from "leaflet";
 import { useRouter } from "next/navigation";
-import {getCurrentUser,getUserPins,saveUserPins,getUserCategories, saveUserCategories} from "./utils/storage";
+import {getCurrentUser,getUserPins,saveUserPins,getUserCategories, saveUserCategories} from "./../utils/storage";
 import dynamic from "next/dynamic";
 const MapView = dynamic(() => import("./_components/MapView"), {
   ssr: false,

@@ -1,0 +1,79 @@
+[
+  {
+    "id": 1,
+    "video": "/videos/create-category&pin.mp4",
+    "title": "Create Categories & Pins",
+    "points": [
+      "Create custom categories with colors and icons",
+      "Click on map to add a new pin",
+      "Enter name and description",
+      "Save pin at exact location"
+    ]
+  },
+  {
+    "id": 2,
+    "video": "/videos/update&delete-pins.mp4",
+    "title": "Update & Delete Pins",
+    "points": [
+      "Edit marker details anytime",
+      "Update name, description or category",
+      "Delete unwanted pins easily",
+      "Manage markers efficiently"
+    ]
+  },
+  {
+    "id": 3,
+    "video": "/videos/delete-category.mp4",
+    "title": "Delete Categories",
+    "points": [
+      "Remove unused categories",
+      "Automatically manage related pins",
+      "Keep map clean and organized",
+      "Simplify category management"
+    ]
+  },
+  {
+    "id": 4,
+    "video": "/videos/show-all-pins.mp4",
+    "title": "Show All Pins",
+    "points": [
+      "View all markers on the map",
+      "Clear applied filters instantly",
+      "Get a complete map overview",
+      "Access all saved locations"
+    ]
+  },
+  {
+    "id": 5,
+    "video": "/videos/zoom-in.mp4",
+    "title": "Zoom & Fly-To Navigation",
+    "points": [
+      "Zoom in to selected markers",
+      "Fly smoothly to locations",
+      "Focus on specific areas",
+      "Improve navigation experience"
+    ]
+  },
+  {
+    "id": 6,
+    "video": "/videos/reset-position.mp4",
+    "title": "Reset Map Position",
+    "points": [
+      "Reset map to default view",
+      "Restore original zoom level",
+      "Re-center the map instantly",
+      "Avoid manual repositioning"
+    ]
+  },
+  {
+    "id": 7,
+    "video": "/videos/feedback.mp4",
+    "title": "Feedback & Support",
+    "points": [
+      "Submit feedback easily",
+      "Share issues or suggestions",
+      "Help improve the application",
+      "Enhance user experience"
+    ]
+  }
+]

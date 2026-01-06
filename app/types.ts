@@ -2,6 +2,7 @@
 //All types are declared in one file which method usefull to declare type in one file and easier Debugg for complex Project
 
 import type { Map as LeafletMap } from "leaflet";
+import MapClickHandler from './_components/_map-component/MapClickHandler';
 
 export type pin = {
     id:string;
@@ -22,11 +23,28 @@ export type Category = {
 
 export type MapViewProps = {
   pins: pin[];
-  onMapClick?: (lat: number, lng: number) => void;
+  onMapClick: (lat: number, lng: number) => void;
   onMouseMove?: (lat: number, lng: number) => void;
   setSelectedPin?: (pin: pin | null) => void;
+  onSelectPin: (pin: pin) => void;
   mapRef: React.MutableRefObject<LeafletMap | null>;
+  openWalkthrough: () => void; 
 };
+
+export type TourControlProps = {
+   onTourClick?: () => void;
+}
+
+export type MapClickHandlerProps = {
+  onMapClick: (lat: number, lng: number) => void;
+}
+
+export type PinMarkerProps = {
+  pin: pin;
+  onSelectPin: (pin: pin) => void;
+}
+
+export type Theme = "light" | "dark";
 
 export type PinFormProps ={
     pin:pin;
@@ -48,7 +66,64 @@ export type SidebarProps = {
   cursorLocation: { lat: number; lng: number } | null;
   categories: Category[];
   onAddCategory: (cat: NewCategory) => void;
-  onDeleteCategory: (name: string) => void;
+  onDeleteCategory: (categoryNames: string[]) => void;
   mapRef: React.MutableRefObject<LeafletMap | null>;
-  userEmail:string;
+  username:string;
 };
+
+export type WalkthroughModalProps = {
+  onClose: () => void;
+};
+
+export interface PinModalProps {
+  pin: pin | null;
+  onClose: () => void;
+};
+
+export type UserSettingsModalProps = {
+  currentEmail: string;
+  onSave: (email: string, password: string) => void;
+  onClose: () => void;
+};
+
+export interface ShowAllPinsModalProps{
+  pins: pin[];
+  onClose: () => void;
+}
+
+
+export type CategoryFilterModalProps = {
+  categories: { name: string; color: string }[];
+  selectedCategories: string[];
+  setSelectedCategories: (v: string[]) => void;
+  onClose: () => void;
+}
+
+export type DeleteCategoryModalProps = {
+  categories: Category[];
+  onDeleteCategories: (names: string[]) => void;
+  onClose: () => void;
+}
+
+export type FeedbackModalProps = {
+  onClose: () => void;
+  onSubmit: (rating: number, description?: string) => void;
+}
+
+export type AddCategoryModalProps = {
+  newCat: { name: string; color: string };
+  setNewCat: (v: { name: string; color: string }) => void;
+  onAddCategory: (v: { name: string; color: string }) => void;
+  onClose: () => void;
+}
+
+export type ReadMoreModalProps = {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  color: string;
+  lat: number;
+  lng: number;
+  onClose: () => void;
+}

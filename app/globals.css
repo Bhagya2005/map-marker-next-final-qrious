@@ -1,26 +1,38 @@
 /*What I Learn ?
 Here In this Project we use tailwind and also simple css because in last if some case we write simple css then how to integrate 
 */
-
+@import "leaflet/dist/leaflet.css";
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --map-bg: 255 255 255;
+  --map-text: 0 0 0;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --map-bg: 10 15 30;
+  --map-text: 230 240 255;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes pin-bounce {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.2s ease-out;
+}
+
+.input {
+  @apply w-full mb-3 p-2 rounded bg-black/40 border border-white/20;
+}
+.btn {
+  @apply w-full bg-green-600 p-2 rounded font-semibold;
 }
 
 .app {
@@ -30,7 +42,20 @@ Here In this Project we use tailwind and also simple css because in last if some
   background: #f7f7f9;
 }
 
-.map-container {
+/* html.dark {
+  background: #09090b;
+  color-scheme: dark;
+}
+
+.leaflet-container {
+  background: #09090b;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 14px;
+} */
+
+/* .map-container {
   flex: 1;
   position: relative;
 }
@@ -180,4 +205,4 @@ Here In this Project we use tailwind and also simple css because in last if some
 .btn.cancel:hover {
   background: #d5d5d5;
 }
-
+ */

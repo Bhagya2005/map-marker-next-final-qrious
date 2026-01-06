@@ -1,3 +1,13 @@
+//what I Learn ?
+// validation from front-end side
+// Encrypt password 
+// process with Email like how to trim , lowercase and new normalizedEmail assign in new variable
+
+//IN CSS :
+//backdrop-blur-2xl 
+//shadow-[0_20px_50px_rgba(0,0,0,0.5)]
+//shadow-xl shadow-rose-300/20 transition-all active:scale-[0.98] 
+
 "use client";
 
 import { useState } from "react";

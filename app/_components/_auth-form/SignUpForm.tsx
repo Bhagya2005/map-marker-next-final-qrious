@@ -1,3 +1,7 @@
+//What I Lern ?
+//Validate Email using regex
+//password validation and on success and Error use Toast
+
 "use client";
 
 import { useState } from "react";

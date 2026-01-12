@@ -9,7 +9,7 @@
 
 "use client";
 
-import Image from "next/image";
+// import Image from "next/image";
 
 export default function AuthLayout({
   children,
@@ -33,13 +33,22 @@ export default function AuthLayout({
               <div className="absolute bg-gradient-to-r from-blue-500 to-emerald-500 rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
 
               <div className="relative w-full aspect-video rounded-[2rem] overflow-hidden border border-white/10 bg-black shadow-2xl">
-                <Image
+                {/* <Image
                   src="/images/demo.png"
                   alt="Map preview"
                   fill
                   className="object-cover"
                   priority
-                />
+                /> */}
+                   <video
+                    src="/videos/create-category&pin.mp4" 
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover"
+                    preload="auto" 
+                ></video>
               </div>
             </div>
             {/* <ul className="text-gray-300  leading-relaxed list-disc list-inside space-y-2">

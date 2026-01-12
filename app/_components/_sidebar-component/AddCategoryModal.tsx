@@ -14,7 +14,7 @@ export default function AddCategoryModal({newCat,setNewCat,onAddCategory,onClose
   return (
     <div className="fixed inset-0 z-[20000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="relative w-full max-w-md bg-zinc-900 rounded-3xl p-6 shadow-2xl flex flex-col gap-4">
-        <button className="absolute top-4 right-4 text-xl font-bold text-white hover:text-red-500 z-50" onClick={onClose}>
+        <button className="absolute top-4 right-4 text-xl font-bold text-gray-300 hover:text-white z-50" onClick={onClose}>
           ✕
         </button>
         <h2 className="text-xl font-bold text-white">Add Category</h2>

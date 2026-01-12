@@ -65,7 +65,7 @@ export default function PinForm({pin,categories,onSave,onClose}: PinFormProps) {
             className="w-full rounded-lg px-4 py-2 border border-white/20 "
           >
             {categories.map((c) => (
-              <option key={c.name} value={c.name}>
+              <option key={c.name} value={c.name} className="text-black">
                 {c.name} 
               </option>
             ))}

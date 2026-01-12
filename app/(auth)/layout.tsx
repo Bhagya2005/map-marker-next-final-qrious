@@ -42,14 +42,39 @@ export default function AuthLayout({
                 />
               </div>
             </div>
-            <ul className="text-gray-300  leading-relaxed list-disc list-inside space-y-2">
+            {/* <ul className="text-gray-300  leading-relaxed list-disc list-inside space-y-2">
               <li>Custom category creation with color and icon support for personalized mapping.</li>
               <li>Map click–based pin creation with name and description, including update and delete options.</li>
               <li>category-based filtering and show-all pins functionality.</li>
               <li>Features such as zoom-in, fly-to markers, zoom to category, and map reset.</li>
               <li>marker popups with user information, timestamps, and smooth hover animations.</li>
               <li>Enhanced user experience with customizable light/dark map themes, user feedback system, and an interactive walkthrough.</li>
-            </ul>
+            </ul> */}
+             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4   text-white">
+                <div className="border border-white/10 rounded-xl p-3 flex items-center gap-2">
+                  <p className="text-sm">Custom category creation with color and icon support.</p>
+                </div>
+              
+                 <div className="border border-white/10 rounded-xl p-3 flex items-center gap-2">
+                  <p className="text-sm">Map click–based pin creation with update and delete options.</p>
+                </div>
+              
+                 <div className="border border-white/10 rounded-xl p-3 flex items-center gap-2">
+                  <p className="text-sm">Category-based filtering and show-all pins functionality.</p>
+                </div>
+              
+                 <div className="border border-white/10 rounded-xl p-3 flex items-center gap-2">
+                  <p className="text-sm">Zoom-in, fly-to markers, zoom to category, and map reset features.</p>
+                </div>
+              
+                <div className="border border-white/10 rounded-xl p-3 flex items-center gap-2">
+                  <p className="text-sm">Marker popups with user info, timestamps, and smooth hover animations.</p>
+                </div>
+              
+                 <div className="border border-white/10 rounded-xl p-3 flex items-center gap-2">
+                  <p className="text-sm">Customizable light/dark map themes, feedback system, and walkthrough.</p>
+                </div>
+            </div>
           </div>
           <div className="order-1 md:order-2 flex justify-center">
             {children}

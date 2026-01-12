@@ -91,7 +91,7 @@ export default function PinForm({pin,categories,onSave,onClose}: PinFormProps) {
 
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-white text-lg font-bold"
+          className="absolute top-3 right-3 text-lg font-bold text-gray-300 hover:text-white"
         >
           ✕
         </button>

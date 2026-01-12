@@ -44,7 +44,7 @@ export default function CategoryFilterModal({categories,selectedCategories,setSe
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-300 text-red-500 font-bold text-xl"
+            className="text-gray-300 font-bold text-xl hover:text-white"
           >
             ✕
           </button>

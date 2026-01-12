@@ -19,6 +19,25 @@ export default function ShowAllPinsModal({ pins, onClose }: ShowAllPinsModalProp
     return false;
   });
 
+  const highlightText = (text: string, search: string) => {
+    if (!search) return text;
+
+    const regex = new RegExp(`(${search})`, "gi");
+    const parts = text.split(regex);
+    console.log(regex);
+    console.log(parts);
+
+    return parts.map((part, index) =>
+      part.toLowerCase() === search.toLowerCase() ? (
+        <span key={index} className="bg-yellow-300 text-black px-1 rounded">
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
+  
   return (
     <div className="fixed inset-0 z-[40000] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-auto min-h-screen text-white/50">
       <div className="w-full sm:max-w-3xl bg-zinc-900 rounded-3xl shadow-2xl p-6 flex flex-col gap-4">
@@ -67,14 +86,14 @@ export default function ShowAllPinsModal({ pins, onClose }: ShowAllPinsModalProp
                   key={p.id}
                   className="hover:bg-zinc-700 break-words"
                 >
-                  <td className="border px-2 py-1 max-w-[150px]">{p.name}</td>
-                  <td className="border px-2 py-1 max-w-[100px]">{p.category}</td>
+                  <td className="border px-2 py-1 max-w-[150px]">{filterBy === "name" ? highlightText(p.name, search) : p.name}</td>
+                  <td className="border px-2 py-1 max-w-[100px]">{filterBy === "category" ? highlightText(p.category, search) : p.category}</td>
                   <td className="border px-2 py-1">
                     <span
                       className="inline-block w-4 h-4 rounded-full border"
                       style={{ backgroundColor: p.color }}
                     ></span>{" "}
-                    {p.color}
+                  {filterBy === "color" ? highlightText(p.color, search) : p.color}
                   </td>
                   <td className="border px-2 py-1">{p.lat.toFixed(5)}</td>
                   <td className="border px-2 py-1">{p.lng.toFixed(5)}</td>
@@ -96,9 +115,9 @@ export default function ShowAllPinsModal({ pins, onClose }: ShowAllPinsModalProp
               key={p.id}
               className="bg-zinc-800 p-3 rounded-2xl flex flex-col gap-1 break-words"
             >
-              <p className="text-sm text-white">{p.name}</p>
+              <p className="text-sm text-white">{filterBy === "name" ? highlightText(p.name, search) : p.name}</p>
               <p className="text-sm text-gray-300">
-                Category: <span className="font-medium">{p.category}</span>
+                Category: <span className="font-medium">{filterBy === "category" ? highlightText(p.category, search) : p.category}</span>
               </p>
               <p className="text-sm text-gray-300 flex items-center gap-1">
                 Color:{" "}
@@ -106,7 +125,7 @@ export default function ShowAllPinsModal({ pins, onClose }: ShowAllPinsModalProp
                   className="inline-block w-4 h-4 rounded-full border"
                   style={{ backgroundColor: p.color }}
                 ></span>{" "}
-                {p.color}
+               {filterBy === "color" ? highlightText(p.color, search) : p.color}
               </p>
               <p className="text-sm text-gray-300">
                 Latitude: {p.lat.toFixed(5)}

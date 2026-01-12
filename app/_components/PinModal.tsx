@@ -1,14 +1,11 @@
 //what I Learn ?
 
-
 //In CSS :
-//inset-0
-//ring-1 ring-black/10 :
-//animate-scaleIn
-//pointer-events-auto
-//truncate
-//overflow-y-auto 
-// break-words
+//inset-0 : top,right,bottom,left 0 hota hai Works only with absolute or fixed
+//ring-1 ring-black/10 : Adds a soft outline (ring) around an element. * Dropdown menus ,Cards ,Input focus style
+//animate-scaleIn : Applies a custom scale animation
+//pointer-events-auto : Allows mouse interaction.
+//truncate : Cuts text in one line and adds `...` [white-space: nowrap;overflow: hidden;text-overflow: ellipsis]
 
 "use client";
 
@@ -63,24 +60,6 @@ export default function PinModal({ pin, onClose }: PinModalProps) {
           <p className="text-xs opacity-60">Longitude: {pin.lng.toFixed(5)}</p>
         </div>
       </div>
-{/* 
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: ${theme === "dark" ? "#27272A" : "#F3F4F6"};
-          border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: ${theme === "dark" ? "#3B82F6" : "#2563EB"};
-          border-radius: 4px;
-        }
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: ${theme === "dark" ? "#3B82F6 #27272A" : "#2563EB #F3F4F6"};
-        }
-      `}</style> */}
     </div>
   );
 }

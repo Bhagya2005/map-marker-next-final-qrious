@@ -8,6 +8,7 @@ import { FeedbackModalProps } from "@/app/types";
 export default function FeedbackModal({onClose,onSubmit}:FeedbackModalProps) {
   const [rating, setRating] = useState(0);
   const [description, setDescription] = useState("");
+  const [hoverRating, setHoverRating] = useState(0); 
 
   const handleSubmit = () => {
     const finalRating = rating || 0;
@@ -27,16 +28,27 @@ export default function FeedbackModal({onClose,onSubmit}:FeedbackModalProps) {
         </button>
         <h2 className="text-xl font-bold text-white">Feedback</h2>
         <div className="flex gap-2">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button
-              key={star}
-              onClick={() => setRating(star)}
-              className={`text-2xl ${rating >= star ? "text-yellow-400" : "text-gray-400"}`}
-            >
-              ★
-            </button>
-          ))}
+          {[1, 2, 3, 4, 5].map((star) => {
+            const isActive = hoverRating
+              ? hoverRating >= star
+              : rating >= star;
+
+            return (
+              <button
+                key={star}
+                onClick={() => setRating(star)}
+                onMouseEnter={() => setHoverRating(star)}
+                onMouseLeave={() => setHoverRating(0)}
+                className={`text-3xl transition-colors ${
+                  isActive ? "text-yellow-400" : "text-gray-400"
+                }`}
+              >
+                ★
+              </button>
+            );
+          })}
         </div>
+
         <textarea
           placeholder="Optional description..."
           value={description}

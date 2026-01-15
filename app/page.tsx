@@ -20,11 +20,10 @@ const MapView = dynamic(() => import("@/app/_components/_map-component/MapView")
 });
 
 export default function HomePage() {
-  const router = useRouter();
   const mapRef = useRef<LeafletMap | null>(null);
 
   const { user, pins, setPins, categories, setCategories, loaded } =
-    useUserData(router);
+    useUserData();
 
   const { showTour, closeTour, open, setOpen } =
     useWalkthrough(loaded, user, pins, categories);

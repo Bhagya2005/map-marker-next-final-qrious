@@ -11,7 +11,7 @@ import { useState } from "react";
 import { UserSettingsModalProps } from '@/app/types';
 
 export default function UserSettingsModal({currentEmail,onSave,onClose}: UserSettingsModalProps) {
-  const [email, setEmail] = useState(currentEmail);
+  const [email, setEmail] = useState(currentEmail ?? "");
   const [password, setPassword] = useState("");
 
  const handleSave = () => {

@@ -68,7 +68,7 @@ export type SidebarProps = {
   onAddCategory: (cat: NewCategory) => void;
   onDeleteCategory: (categoryNames: string[]) => void;
   mapRef: React.MutableRefObject<LeafletMap | null>;
-  username:string;
+  username?:string;
 };
 
 export type WalkthroughModalProps = {
@@ -81,7 +81,7 @@ export interface PinModalProps {
 };
 
 export type UserSettingsModalProps = {
-  currentEmail: string;
+  currentEmail?: string;
   onSave: (email: string, password: string) => void;
   onClose: () => void;
 };

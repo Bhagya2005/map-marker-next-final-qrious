@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import tourData from "@/data/tourData.json";
 import { motion } from "framer-motion";
 import {WalkthroughModalProps} from "@/app/types"
+import { markTourAsSeen } from "@/utils/storage/walkthrough.storage";
 
 export default function WalkthroughModal({ onClose }: WalkthroughModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -30,10 +31,11 @@ export default function WalkthroughModal({ onClose }: WalkthroughModalProps) {
     if (currentStep < tourData.length - 1) {
       setCurrentStep(p => p + 1);
     } else {
-      localStorage.setItem("hasSeenTour", "true");
+      markTourAsSeen();
       onClose();
     }
   };
+
 
   const handlePrev = () => {
     if (currentStep > 0) {

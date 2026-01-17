@@ -18,7 +18,7 @@ export default function AuthLayout({
 }) {
   return (
     <div className="relative min-h-screen px-4 overflow-hidden bg-[#0a0a0a] flex items-center justify-center">
-      <p className="text-red-600 font-bold text-center my-2">
+      <p className="text-red-900 font-bold text-center my-2">
       Backend integration is in progress. Code is being developed on a separate branch and will be merged soon.
       </p>
 

@@ -20,15 +20,15 @@ export default function AuthLayout({
     <div className="relative min-h-screen px-4 overflow-hidden bg-[#0a0a0a] flex items-center justify-center">
      
       <div className="relative z-10 w-full max-w-7xl  py-10">
-         <p className="text-red-900 font-bold text-center my-2">
-          Backend integration is in progress. Code is being developed on a separate branch and will be merged soon.
-          </p>
+       
 
         <div className="text-center mb-12">
           <h1 className="text-4xl font-black text-white/70">
             Map Marking Application
           </h1>
-
+          <p className="text-red-900 font-bold text-center my-2">
+          Backend integration is in progress. Code is being developed on a separate branch and will be merged soon.
+          </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-12 items-center mt-0">

@@ -1,16 +1,10 @@
-//What I Lern ?
-//Validate Email using regex
-//password validation and on success and Error use Toast
-
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { hashPassword } from "@/utils/crypto";
 import { showSuccess, showError } from "@/utils/toast";
-import { normalizeEmail, isValidEmail } from "@/utils/validation";
-import { createUser, isUserExists } from "@/utils/storage/user.storage";
+import type { UserRole } from "@/app/types";
 
 export default function SignUpForm() {
   const router = useRouter();
@@ -19,41 +13,25 @@ export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<"admin" | "regular">("regular");
 
   const handleSignUp = async () => {
-    const normalizedEmail = normalizeEmail(email);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password, role }),
+      });
 
-    if (!username.trim()) {
-      return showError("Username required");
+      const data = await res.json();
+
+      if (!res.ok) return showError(data.message || "Registration failed");
+
+      showSuccess("Account created successfully!");
+      router.push("/login");
+    } catch (err: any) {
+      showError(err.message || "Something went wrong");
     }
-
-    if (!isValidEmail(normalizedEmail)) {
-      return showError("Invalid email");
-    }
-
-    if (password.length < 6) {
-      return showError("Password must be 6+ chars");
-    }
-
-    if (password !== confirmPassword) {
-      return showError("Passwords do not match");
-    }
-
-    if (isUserExists(normalizedEmail)) {
-      return showError("User already exists");
-    }
-
-    const hashedPassword = await hashPassword(password);
-
-    createUser({
-      id: crypto.randomUUID(),
-      username: username.trim(),
-      email: normalizedEmail,
-      password: hashedPassword
-    });
-
-    showSuccess("Account created successfully!");
-    setTimeout(() => router.push("/login"), 1500);
   };
 
   return (
@@ -68,13 +46,41 @@ export default function SignUpForm() {
       <div className="space-y-4">
         <div>
           <label className="text-xs font-semibold text-gray-400 uppercase ml-1">
+            User Type
+          </label>
+          <div className="flex gap-2 mt-1">
+            <button
+              onClick={() => setRole("regular")}
+              className={`flex-1 p-3 rounded-2xl font-semibold transition-all ${
+                role === "regular"
+                  ? "bg-blue-500/50 border border-blue-400 text-white"
+                  : "bg-white/5 border border-white/10 text-gray-400 hover:border-white/20"
+              }`}
+            >
+              Regular
+            </button>
+            <button
+              onClick={() => setRole("admin")}
+              className={`flex-1 p-3 rounded-2xl font-semibold transition-all ${
+                role === "admin"
+                  ? "bg-purple-500/50 border border-purple-400 text-white"
+                  : "bg-white/5 border border-white/10 text-gray-400 hover:border-white/20"
+              }`}
+            >
+              Admin
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold text-gray-400 uppercase ml-1">
             Username
           </label>
           <input
             className="w-full p-3.5 mt-1 rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
             value={username}
             placeholder="Bhagya012"
-            onChange={e => setUsername(e.target.value)}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </div>
 
@@ -86,7 +92,7 @@ export default function SignUpForm() {
             className="w-full p-3.5 mt-1 rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
             value={email}
             placeholder="bhagya@example.com"
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
@@ -100,7 +106,7 @@ export default function SignUpForm() {
               className="w-full p-3.5 mt-1 rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
               value={password}
               placeholder="******"
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
@@ -113,7 +119,7 @@ export default function SignUpForm() {
               className="w-full p-3.5 mt-1 rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
               value={confirmPassword}
               placeholder="******"
-              onChange={e => setConfirmPassword(e.target.value)}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
         </div>

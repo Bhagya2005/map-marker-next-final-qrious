@@ -2,53 +2,31 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  getCurrentUser,
-  getUserPins,
-  getUserCategories,
-  saveUserPins,
-  saveUserCategories
-} from "@/utils/storage/app.storage";
+import {getCurrentUser,getUserPins,getUserCategories,saveUserPins,saveUserCategories} from "@/utils/storage/app.storage";
 import { pin, Category } from "@/app/types";
 import { User } from "@/utils/storage/user.storage";
 
 export function useUserData() {
-  const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [pins, setPins] = useState([]);
+  const [categories, setCategories] = useState([]);
 
-  const [user, setUser] = useState<User | null>(null);
-  const [pins, setPins] = useState<pin[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const bootstrapUser = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  useEffect(() => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
-      router.push("/login");
-      return;
-    }
+    const res = await fetch("/api/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-    setUser(currentUser);
+    if (!res.ok) return;
 
-    const userKey = currentUser.id ?? currentUser.email;
+    const data = await res.json();
+    setUser(data.user);
+    setPins(data.pins);
+    setCategories(data.categories);
+  };
 
-    setPins(getUserPins(userKey));
-    setCategories(getUserCategories(userKey));
-    setLoaded(true);
-  }, [router]);
-
-  useEffect(() => {
-    if (user) {
-      const userKey = user.id ?? user.email;
-      saveUserPins(userKey, pins);
-    }
-  }, [pins, user]);
-
-  useEffect(() => {
-    if (user) {
-      const userKey = user.id ?? user.email;
-      saveUserCategories(userKey, categories);
-    }
-  }, [categories, user]);
-
-  return {user,pins,setPins,categories,setCategories,loaded};
+  return {user,pins,categories,setUser,setPins,setCategories,bootstrapUser};
 }
+ 

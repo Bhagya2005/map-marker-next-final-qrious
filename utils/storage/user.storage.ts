@@ -1,11 +1,13 @@
 import { storageService } from "./storage.service";
 import { normalizeEmail } from "@/utils/validation";
+import type { UserRole } from "@/app/types";
 
 export type User = {
   id?: string;
   username?: string;
   email: string;
   password: string;
+  role?: UserRole;
 };
 
 export const getUsers = (): User[] => {
@@ -14,19 +16,21 @@ export const getUsers = (): User[] => {
 
 export const loginUser = (
   email: string,
-  hashedPassword: string
+  hashedPassword: string,
+  role: UserRole = 'regular'
 ): User | null => {
   const normalizedEmail = normalizeEmail(email);
   const users = getUsers();
 
   const user = users.find(
-    u => u.email === normalizedEmail && u.password === hashedPassword
+    u => u.email === normalizedEmail && u.password === hashedPassword && (u.role === role || !u.role)
   );
 
   if (!user) return null;
 
-  storageService.set("currentUser", user);
-  return user;
+  const userData = { ...user, role };
+  storageService.set("currentUser", userData);
+  return userData;
 };
 
 export const isUserExists = (email: string): boolean => {
@@ -36,7 +40,7 @@ export const isUserExists = (email: string): boolean => {
 
 export const createUser = (user: User): void => {
   const users = getUsers();
-  users.push(user);
+  users.push({ ...user, role: user.role || 'regular' });
   storageService.set("users", users);
 };
 
@@ -65,10 +69,25 @@ export const logoutUser = (): void => {
 
 export const updateUserSettings = (
   email: string,
-  password?: string
+  password?: string,
+  username?: string
 ): void => {
-  storageService.set("userEmail", email);
-  if (password) {
-    storageService.set("userPassword", password);
+  const currentUser = getCurrentUser();
+  if (currentUser) {
+    const users = getUsers();
+    const index = users.findIndex(u => u.email === currentUser.email);
+    if (index !== -1) {
+      if (username) users[index].username = username;
+      if (password) users[index].password = password;
+      storageService.set("users", users);
+      
+      const updatedUser = { ...currentUser };
+      if (username) updatedUser.username = username;
+      if (password) updatedUser.password = password;
+      storageService.set("currentUser", updatedUser);
+    }
   }
+  
+  if (email) storageService.set("userEmail", email);
+  if (password) storageService.set("userPassword", password);
 };

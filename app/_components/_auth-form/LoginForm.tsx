@@ -1,43 +1,66 @@
-//what I Learn ?
-//same as ForgotPasswordForm
-//transition-colors
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { hashPassword } from "@/utils/crypto";
 import { showSuccess, showError } from "@/utils/toast";
-import { normalizeEmail, isValidEmail } from "@/utils/validation";
-import { loginUser } from "@/utils/storage/user.storage";
+import { useAuthStore } from "@/app/store/useAuthStore";
+import type { UserRole } from "@/app/types";
 
 export default function LoginForm() {
+  const [mounted, setMounted] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<UserRole>("regular");
+
   const router = useRouter();
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const handleLogin = async () => {
-    const normalizedEmail = normalizeEmail(email);
+    if (!email || !password) return showError("Email & password required");
 
-    if (!isValidEmail(normalizedEmail)) {
-      return showError("Invalid email address");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        showError("Server returned invalid response");
+        return;
+      }
+
+      if (!res.ok || !data.user || !data.token) {
+        return showError(data?.message || "Login failed");
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      const store = useAuthStore.getState();
+      store.setUser(data.user);
+      store.setLoading(false);
+
+      setTimeout(() => {
+        router.replace(data.user.role === "admin" ? "/admin/dashboard" : "/");
+        showSuccess("Login successful");
+      }, 0);
+
+    } catch (err) {
+      console.error(err);
+      showError("Something went wrong");
     }
-
-    if (!password) {
-      return showError("Password is required");
-    }
-
-    const hashedPassword = await hashPassword(password);
-    const user = loginUser(normalizedEmail, hashedPassword);
-
-    if (!user) {
-      return showError("Invalid credentials");
-    }
-
-    showSuccess("Welcome back!");
-    router.push("/");
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md p-8 md:p-10 transition-all hover:border-white/20">
@@ -51,13 +74,43 @@ export default function LoginForm() {
       <div className="space-y-4">
         <div>
           <label className="text-xs font-semibold text-gray-400 uppercase ml-1">
+            User Type
+          </label>
+          <div className="flex gap-2 mt-1">
+            <button
+              type="button"
+              onClick={() => setRole("regular")}
+              className={`flex-1 p-3 rounded-2xl font-semibold transition-all ${
+                role === "regular"
+                  ? "bg-blue-500/50 border border-blue-400 text-white"
+                  : "bg-white/5 border border-white/10 text-gray-400 hover:border-white/20"
+              }`}
+            >
+              Regular
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("admin")}
+              className={`flex-1 p-3 rounded-2xl font-semibold transition-all ${
+                role === "admin"
+                  ? "bg-purple-500/50 border border-purple-400 text-white"
+                  : "bg-white/5 border border-white/10 text-gray-400 hover:border-white/20"
+              }`}
+            >
+              Admin
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs font-semibold text-gray-400 uppercase ml-1">
             Email Address
           </label>
           <input
             className="w-full p-4 mt-1 rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
             placeholder="bhagya@example.com"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
@@ -68,13 +121,14 @@ export default function LoginForm() {
           <input
             type="password"
             className="w-full p-4 mt-1 rounded-2xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
-             placeholder="******"
+            placeholder="******"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
         <button
+          type="button"
           onClick={handleLogin}
           className="w-full text-white p-4 rounded-2xl font-bold shadow-xl shadow-blue-300/20 transition-all active:scale-[0.98] mt-4"
         >

@@ -3,10 +3,6 @@ import { storageService } from "./storage.service";
 import { getByUserId, saveByUserId } from "./entity.storage";
 import {User} from "./user.storage";
 
-// export const getCurrentUser = () => {
-//   return storageService.get("currentUser", null);
-// };
-
 export const getCurrentUser = (): User | null => {
   return storageService.get<User | null>("currentUser", null);
 };

@@ -4,6 +4,16 @@
 import type { Map as LeafletMap } from "leaflet";
 import MapClickHandler from './_components/_map-component/MapClickHandler';
 
+export type UserRole = 'admin' | 'regular';
+
+export type AuthUser = {
+  id: string;
+  email: string;
+  username: string;
+  role: UserRole;
+  token: string;
+};
+
 export type pin = {
     id:string;
     name:string;

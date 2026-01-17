@@ -59,8 +59,9 @@ export default function Sidebar({ pins, selectedPin, onSelectPin, onDeletePin, o
     showSuccess("User settings updated!");
   };
 
-  const handleFeedbackSubmit = (rating: number, description?: string) => {
-    saveFeedback(rating, description);
+  const handleFeedbackSubmit = (rating: number, message?: string) => {
+    const title = `Feedback ${new Date().toLocaleDateString()}`;
+    saveFeedback(rating, message, title, "general");
     showSuccess("Thank you for your feedback!");
   };
 

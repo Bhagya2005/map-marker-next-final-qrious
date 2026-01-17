@@ -1,125 +1,131 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import tourData from "@/data/tourData.json";
-import { motion } from "framer-motion";
-import {WalkthroughModalProps} from "@/app/types"
-import { markTourAsSeen } from "@/utils/storage/walkthrough.storage";
+import { useEffect, useState } from "react";
+import ReactPlayer from "react-player";
+import { WalkthroughModalProps } from "@/app/types";
+
+type Step = {
+  _id: string;
+  title: string;
+  description?: string;
+  videoUrl?: string;
+  points?: string[];
+};
 
 export default function WalkthroughModal({ onClose }: WalkthroughModalProps) {
+  const [steps, setSteps] = useState<Step[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  const step = tourData[currentStep];
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    tourData.forEach(s => {
-      const v = document.createElement("video");
-      v.src = s.video;
-      v.preload = "auto";
-    });
+    let active = true;
+
+    (async () => {
+      try {
+        const res = await fetch("/api/walkthroughs", { cache: "no-store" });
+        const data = await res.json();
+
+        if (!active || !Array.isArray(data)) return;
+
+        setSteps(
+          data.map((s) => ({
+            ...s,
+            points: s.description
+              ? s.description.split(",").map((p: string) => p.trim())
+              : [],
+          }))
+        );
+      } catch (e) {
+        console.error("Walkthrough fetch failed", e);
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.load();
-      videoRef.current.play().catch(() => {});
-    }
-  }, [currentStep]);
+  if (loading) {
+    return (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 text-white">
+        Loading tour...
+      </div>
+    );
+  }
 
-  const handleNext = () => {
-    if (currentStep < tourData.length - 1) {
-      setCurrentStep(p => p + 1);
+  if (!steps.length) return null;
+
+  const step = steps[currentStep];
+  const hasVideo = Boolean(step.videoUrl);
+
+  const next = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep((p) => p + 1);
     } else {
-      markTourAsSeen();
       onClose();
     }
   };
 
-
-  const handlePrev = () => {
-    if (currentStep > 0) {
-      setCurrentStep(p => p - 1);
-    }
+  const prev = () => {
+    if (currentStep > 0) setCurrentStep((p) => p - 1);
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-md">
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.25 }}
-        className="w-[92%] max-w-md overflow-hidden rounded-2xl text-white bg-black/30 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.35)] border border-white/30"
-      >
-        <div className="relative">
-          <video
-            ref={videoRef}
-            src={step.video}
-            autoPlay
-            muted
-            playsInline
-            className="w-full h-52 object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md">
+      <div className="w-[92%] max-w-md rounded-2xl bg-black/80 text-white overflow-hidden">
+        <div className="h-52 bg-black flex items-center justify-center">
+          {hasVideo ? (
+            <ReactPlayer
+              key={step._id}
+              url={step.videoUrl}
+              width="100%"
+              height="100%"
+              controls
+              playing={false}
+            />
+          ) : (
+            <span className="text-gray-400">No video</span>
+          )}
         </div>
 
-        <motion.div
-          key={currentStep}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
-          className="p-5"
-        >
-          <h3 className="text-lg font-semibold mb-1">{step.title}</h3>
-          <ul className="text-sm mb-5 space-y-2 list-disc list-inside text-gray-200">
-                {step.points.map((point, i) => (
-                  <li key={i}>{point}</li>
-                ))}
-          </ul>
+        <div className="p-4">
+          <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
 
+          {step.points?.length > 0 && (
+            <ul className="text-sm list-disc list-inside text-gray-300 mb-4">
+              {step.points.map((p, i) => (
+                <li key={i}>{p}</li>
+              ))}
+            </ul>
+          )}
 
-          <div className="flex justify-center gap-2 mb-5">
-            {tourData.map((_, i) => (
-              <span
-                key={i}
-                className={`h-2 w-2 rounded-full transition-all ${
-                  i === currentStep ? "bg-green-600 scale-125" : "bg-gray-300"
-                }`}
-              />
-            ))}
-          </div>
-
-          <div className="flex items-center justify-between">
-            <button
-              onClick={onClose}
-              className="text-sm text-blue-400 transition"
-            >
-              Skip tour
+          <div className="flex justify-between">
+            <button onClick={onClose} className="text-blue-400">
+              Skip
             </button>
 
             <div className="flex gap-2">
               <button
-                onClick={handlePrev}
+                onClick={prev}
                 disabled={currentStep === 0}
-                className={`px-4 py-2 text-sm rounded-full font-medium transition-all ${
-                  currentStep === 0
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gray-700 hover:bg-gray-800 text-white"
-                }`}
+                className="px-3 py-1 bg-gray-600 rounded disabled:opacity-50"
               >
                 Prev
               </button>
 
               <button
-                onClick={handleNext}
-                className="px-5 py-2 text-sm rounded-full font-medium text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 shadow-md hover:shadow-lg transition-all"
+                onClick={next}
+                className="px-4 py-1 bg-green-600 rounded"
               >
-                {currentStep === tourData.length - 1 ? "Finish" : "Next"}
+                {currentStep === steps.length - 1 ? "Finish" : "Next"}
               </button>
             </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }
+

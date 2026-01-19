@@ -15,7 +15,7 @@ const UserSchema = new Schema(
     password: {
       type: String,
       required: true,
-      select: false, // 🔒 hide password by default
+      select: false, 
     },
     role: {
       type: String,
@@ -26,7 +26,6 @@ const UserSchema = new Schema(
   { timestamps: true }
 );
 
-// 🔥 PASSWORD HASH
 UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
@@ -35,7 +34,6 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-// 🔥 PASSWORD COMPARE
 UserSchema.methods.comparePassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

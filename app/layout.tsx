@@ -4,7 +4,7 @@ import "./globals.css";
 import { useEffect } from "react"; 
 import { ThemeProvider } from "./_components/theme-context";
 import { Toaster } from "react-hot-toast";
-import { useAuthStore } from "@/app/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {

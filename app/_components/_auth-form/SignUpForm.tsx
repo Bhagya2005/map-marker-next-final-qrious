@@ -1,38 +1,22 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { showSuccess, showError } from "@/utils/toast";
-import type { UserRole } from "@/app/types";
+import { useSignUp } from "@/hooks/use-signup";
 
 export default function SignUpForm() {
-  const router = useRouter();
-
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState<"admin" | "regular">("regular");
-
-  const handleSignUp = async () => {
-    try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, role }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) return showError(data.message || "Registration failed");
-
-      showSuccess("Account created successfully!");
-      router.push("/login");
-    } catch (err: any) {
-      showError(err.message || "Something went wrong");
-    }
-  };
+  const {
+    username,
+    setUsername,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    role,
+    setRole,
+    handleSignUp,
+  } = useSignUp();
 
   return (
     <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md p-8 md:p-10 transition-all hover:border-white/20">
@@ -109,7 +93,6 @@ export default function SignUpForm() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-
           <div>
             <label className="text-xs font-semibold text-gray-400 uppercase ml-1">
               Confirm
@@ -126,7 +109,7 @@ export default function SignUpForm() {
 
         <button
           onClick={handleSignUp}
-          className="w-full text-white p-4 rounded-2xl font-bold shadow-xl shadow-green-300/20 transition-all active:scale-[0.98] mt-4"
+          className="w-full text-white p-4 rounded-2xl font-bold shadow-xl shadow-green-300/20 transition-all active:scale-[0.98] mt-4 cursor-pointer"
         >
           Create Account
         </button>
@@ -135,10 +118,7 @@ export default function SignUpForm() {
       <div className="mt-8 text-center">
         <p className="text-sm text-gray-400">
           Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors"
-          >
+          <Link href="/login" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors">
             Sign In
           </Link>
         </p>

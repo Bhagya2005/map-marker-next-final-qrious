@@ -25,8 +25,8 @@ import FeedbackModal from "@/app/_components/_sidebar-component/FeedbackModal";
 import ShowAllPinsModal from "@/app/_components/_sidebar-component/ShowAllPinsModal";
 import DeleteCategoryModal from "@/app/_components/_sidebar-component/DeleteCategoryModal";
 import { showSuccess, showError } from "@/utils/toast";
-import { updateUserSettings } from "@/utils/storage/user.storage";
-import { saveFeedback } from "@/utils/storage/feedback.storage";
+// import { updateUserSettings } from "@/utils/storage/user.storage";
+// import { saveFeedback } from "@/utils/storage/feedback.storage";
 
 
 export default function Sidebar({ pins, selectedPin, onSelectPin, onDeletePin, onEditPin, cursorLocation, categories, onAddCategory, mapRef, username, onDeleteCategory }: SidebarProps) {
@@ -55,13 +55,13 @@ export default function Sidebar({ pins, selectedPin, onSelectPin, onDeletePin, o
 
   const handleUserSave = (email: string, password: string) => {
     setUser(email);
-    updateUserSettings(email, password);
+    // updateUserSettings(email, password);
     showSuccess("User settings updated!");
   };
 
   const handleFeedbackSubmit = (rating: number, message?: string) => {
     const title = `Feedback ${new Date().toLocaleDateString()}`;
-    saveFeedback(rating, message, title, "general");
+    // saveFeedback(rating, message, title, "general");
     showSuccess("Thank you for your feedback!");
   };
 

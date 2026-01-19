@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/app/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { pin } from "@/app/types";
 import Sidebar from "@/app/_components/_sidebar-component/Sidebar";
 import PinForm from "@/app/_components/PinForm";

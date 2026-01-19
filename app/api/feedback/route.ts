@@ -1,51 +1,49 @@
-import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/mongodb';
-import Feedback from '@/lib/models/Feedback';
-import { authenticateRequest } from '@/lib/middleware/auth';
+import { NextResponse } from "next/server";
+import dbConnect from "@/lib/mongodb";
+import Feedback from "@/lib/models/Feedback";
 
-export async function GET(req: NextRequest) {
-  try {
-    await dbConnect();
-    const feedback = await Feedback.find().populate('userId', 'username email');
-    return NextResponse.json(feedback);
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || 'Failed to fetch feedback' },
-      { status: 500 }
-    );
+export async function GET(req: Request) {
+  await dbConnect();
+  const { searchParams } = new URL(req.url);
+
+  const page = parseInt(searchParams.get("page") || "1");
+  const limit = parseInt(searchParams.get("limit") || "10");
+  const search = searchParams.get("search") || "";
+  const category = searchParams.get("category") || "";
+  const status = searchParams.get("status") || "";
+
+  // Dynamic MongoDB Query
+  const query: any = {};
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { message: { $regex: search, $options: "i" } }
+    ];
   }
-}
+  if (category) query.category = category;
+  if (status) query.status = status;
 
-export async function POST(req: NextRequest) {
   try {
-    const auth = authenticateRequest(req);
+    const skip = (page - 1) * limit;
+    const feedbacks = await Feedback.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-    if (!auth.authenticated || !auth.user) {
-      return NextResponse.json(
-        { message: auth.error || 'Unauthorized' },
-        { status: 401 }
-      );
-    }
+    const total = await Feedback.countDocuments(query);
 
-    await dbConnect();
-    const { title, message, rating, category } = await req.json();
+    // Stats for Charts (Sab feedbacks fetch karne ke bajaye aggregate use karein)
+    const stats = await Feedback.aggregate([
+      { $group: { _id: "$status", count: { $sum: 1 } } }
+    ]);
 
-    const feedback = new Feedback({
-      userId: (auth.user as any).id,
-      title,
-      message,
-      rating,
-      category,
+    return NextResponse.json({
+      feedbacks,
+      totalPages: Math.ceil(total / limit),
+      totalItems: total,
+      stats
     });
-
-    await feedback.save();
-    await feedback.populate('userId', 'username email');
-
-    return NextResponse.json(feedback, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || 'Failed to create feedback' },
-      { status: 500 }
-    );
+  } catch (err) {
+    return NextResponse.json({ error: "Fetch failed" }, { status: 500 });
   }
 }

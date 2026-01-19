@@ -1,64 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { showSuccess, showError } from "@/utils/toast";
-import { useAuthStore } from "@/app/store/useAuthStore";
-import type { UserRole } from "@/app/types";
+import { useLogin } from "@/hooks/use-login";
 
 export default function LoginForm() {
-  const [mounted, setMounted] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("regular");
-
-  const router = useRouter();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const handleLogin = async () => {
-    if (!email || !password) return showError("Email & password required");
-
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const text = await res.text();
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        showError("Server returned invalid response");
-        return;
-      }
-
-      if (!res.ok || !data.user || !data.token) {
-        return showError(data?.message || "Login failed");
-      }
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      const store = useAuthStore.getState();
-      store.setUser(data.user);
-      store.setLoading(false);
-
-      setTimeout(() => {
-        router.replace(data.user.role === "admin" ? "/admin/dashboard" : "/");
-        showSuccess("Login successful");
-      }, 0);
-
-    } catch (err) {
-      console.error(err);
-      showError("Something went wrong");
-    }
-  };
+  const {mounted,email,setEmail,password,setPassword,role,setRole,handleLogin} = useLogin();
 
   if (!mounted) return null;
 
@@ -130,7 +76,7 @@ export default function LoginForm() {
         <button
           type="button"
           onClick={handleLogin}
-          className="w-full text-white p-4 rounded-2xl font-bold shadow-xl shadow-blue-300/20 transition-all active:scale-[0.98] mt-4"
+          className="w-full text-white p-4 rounded-2xl font-bold  shadow-xl shadow-blue-300/20 transition-all active:scale-[0.98] mt-4 cursor-pointer"
         >
           Sign In
         </button>
@@ -139,19 +85,13 @@ export default function LoginForm() {
       <div className="mt-8 space-y-3 text-center">
         <p className="text-sm text-gray-400">
           New user?{" "}
-          <Link
-            href="/sign-up"
-            className="text-blue-400 hover:text-blue-300 font-semibold transition-colors"
-          >
+          <Link href="/sign-up" className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
             Create Account
           </Link>
         </p>
         <p className="text-sm text-gray-400">
           Forgot your password?{" "}
-          <Link
-            href="/forgot-password"
-            className="text-gray-100 hover:text-white font-semibold transition-colors"
-          >
+          <Link href="/forgot-password" className="text-gray-100 hover:text-white font-semibold transition-colors">
             Reset here
           </Link>
         </p>

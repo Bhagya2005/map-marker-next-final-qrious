@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ReactPlayer from "react-player";
 import { WalkthroughModalProps } from "@/app/types";
 
 type Step = {
@@ -16,31 +15,47 @@ export default function WalkthroughModal({ onClose }: WalkthroughModalProps) {
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
 
-    (async () => {
+    const fetchWalkthroughs = async () => {
       try {
-        const res = await fetch("/api/walkthroughs", { cache: "no-store" });
-        const data = await res.json();
+        setLoading(true);
+        setError(null);
 
-        if (!active || !Array.isArray(data)) return;
+        const res = await fetch("/api/walkthroughs", { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed to fetch walkthroughs");
+
+        const json = await res.json();
+        const list = json.walkthroughs ?? [];
+
+        if (!active) return;
+
+        if (!list.length) {
+          setError("No walkthrough data found");
+          setSteps([]);
+          return;
+        }
 
         setSteps(
-          data.map((s) => ({
+          list.map((s: any) => ({
             ...s,
             points: s.description
               ? s.description.split(",").map((p: string) => p.trim())
               : [],
           }))
         );
-      } catch (e) {
-        console.error("Walkthrough fetch failed", e);
+      } catch (err) {
+        console.error(err);
+        if (active) setError("Something went wrong");
       } finally {
         if (active) setLoading(false);
       }
-    })();
+    };
+
+    fetchWalkthroughs();
 
     return () => {
       active = false;
@@ -50,7 +65,23 @@ export default function WalkthroughModal({ onClose }: WalkthroughModalProps) {
   if (loading) {
     return (
       <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 text-white">
-        Loading tour...
+        Loading walkthrough...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 text-white">
+        <div className="bg-black/80 p-6 rounded-xl text-center">
+          <p className="mb-4">{error}</p>
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-red-600 rounded"
+          >
+            Close
+          </button>
+        </div>
       </div>
     );
   }
@@ -58,14 +89,10 @@ export default function WalkthroughModal({ onClose }: WalkthroughModalProps) {
   if (!steps.length) return null;
 
   const step = steps[currentStep];
-  const hasVideo = Boolean(step.videoUrl);
 
   const next = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep((p) => p + 1);
-    } else {
-      onClose();
-    }
+    if (currentStep < steps.length - 1) setCurrentStep((p) => p + 1);
+    else onClose();
   };
 
   const prev = () => {
@@ -75,20 +102,29 @@ export default function WalkthroughModal({ onClose }: WalkthroughModalProps) {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md">
       <div className="w-[92%] max-w-md rounded-2xl bg-black/80 text-white overflow-hidden">
+
+
         <div className="h-52 bg-black flex items-center justify-center">
-          {hasVideo ? (
-            <ReactPlayer
-              key={step._id}
-              url={step.videoUrl}
-              width="100%"
-              height="100%"
-              controls
-              playing={false}
+          {step.videoUrl ? (
+            <video
+              src={step.videoUrl}
+              autoPlay
+              muted
+              playsInline
+              loop
+              preload="auto"
+              className="w-full h-full object-contain bg-black"
+              onError={(e) => console.error("Video load error", e)}
             />
+
           ) : (
-            <span className="text-gray-400">No video</span>
+            <div className="h-full flex items-center justify-center text-gray-400">
+              No video available
+            </div>
           )}
         </div>
+
+
 
         <div className="p-4">
           <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
@@ -101,8 +137,9 @@ export default function WalkthroughModal({ onClose }: WalkthroughModalProps) {
             </ul>
           )}
 
-          <div className="flex justify-between">
-            <button onClick={onClose} className="text-blue-400">
+
+          <div className="flex justify-between items-center">
+            <button onClick={onClose} className="text-blue-400 cursor-pointer">
               Skip
             </button>
 
@@ -110,22 +147,22 @@ export default function WalkthroughModal({ onClose }: WalkthroughModalProps) {
               <button
                 onClick={prev}
                 disabled={currentStep === 0}
-                className="px-3 py-1 bg-gray-600 rounded disabled:opacity-50"
+                className="px-3 py-1 bg-gray-600 rounded disabled:opacity-50 cursor-pointer"
               >
                 Prev
               </button>
 
               <button
                 onClick={next}
-                className="px-4 py-1 bg-green-600 rounded"
+                className="px-4 py-1 bg-green-600 rounded cursor-pointer"
               >
                 {currentStep === steps.length - 1 ? "Finish" : "Next"}
               </button>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
 }
-

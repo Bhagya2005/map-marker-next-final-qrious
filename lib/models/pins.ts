@@ -8,6 +8,8 @@ const PinSchema = new mongoose.Schema({
   color: String,
   category: String,
   userId: String,
-});
+  images: [String],
+  privacy: { type: String, enum: ['public', 'private'], default: 'public' },
+}, { timestamps: true });
 
 export default mongoose.models.Pin || mongoose.model("Pin", PinSchema);

@@ -3,8 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getCurrentUser, logoutUser } from "@/utils/storage/user.storage";
-
-// Components Import
 import Sidebar from "@/app/_components/admin/Sidebar";
 import UserManagement from "@/app/_components/admin/modules/UsersManagement";
 import PinManagement from "@/app/_components/admin/modules/PinManagment";
@@ -20,7 +18,6 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>("users");
 
   useEffect(() => {
-    // Manual Retry Logic for localStorage
     const verifyAuth = () => {
       const data = localStorage.getItem("user");
       if (data) {
@@ -66,13 +63,10 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-[#09090b] text-zinc-100 overflow-hidden">
-      {/* 1. SIDEBAR */}
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* 2. MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col min-w-0">
-        
-        {/* HEADER */}
+     
         <header className="h-16 border-b border-white/10 bg-zinc-900/50 flex items-center justify-between px-8">
           <div>
             <h2 className="text-sm font-medium text-zinc-400 uppercase tracking-widest">Management</h2>
@@ -93,7 +87,6 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {/* DYNAMIC CONTENT CONTAINER */}
         <main className="flex-1 overflow-y-auto p-8 custom-scrollbar">
           <div className="max-w-7xl mx-auto">
             {activeTab === "users" && <UserManagement />}
@@ -101,7 +94,6 @@ export default function AdminDashboard() {
             {activeTab === "feedbacks" && <FeedbackManagement />}
             {activeTab === "walkthroughs" && <WalkthroughManagement />}
             
-            {/* Placeholder for Categories */}
             {activeTab === "categories" && (
               <div className="p-20 text-center border-2 border-dashed border-white/5 rounded-xl">
                 <p className="text-zinc-500">Category management coming soon...</p>

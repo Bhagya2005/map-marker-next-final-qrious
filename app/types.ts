@@ -15,14 +15,17 @@ export type AuthUser = {
 };
 
 export type pin = {
-    id:string;
-    name:string;
-    description:string;
-    lat:number;
-    lng:number;
-    color:string;
-    category:string;
-    userId:string;
+  _id?: string;
+  id?: string;
+  name:string;
+  description?: string;
+  lat:number;
+  lng:number;
+  color?: string;
+  category:string;
+  userId:string;
+  images?: string[]; // base64 or image URLs
+  privacy?: 'public' | 'private';
 };
 
 export type Category = {

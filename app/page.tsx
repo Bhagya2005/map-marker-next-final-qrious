@@ -1,128 +1,101 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/store/useAuthStore";
-import { pin } from "@/app/types";
-import Sidebar from "@/app/_components/_sidebar-component/Sidebar";
-import PinForm from "@/app/_components/PinForm";
-import PinModal from "@/app/_components/PinModal";
-import WalkthroughModal from "@/app/_components/WalkthroughModal";
-import { buildPin } from "@/utils/pinHelpers";
+import { useCurrentUserStore } from "@/stores/appStore"; 
+import { useCategoryStore } from "@/stores/categoryStore";
 import { showError } from "@/utils/toast";
 
-const MapView = dynamic(
-  () => import("@/app/_components/_map-component/MapView"),
-  { ssr: false }
-);
+import Sidebar from "@/app/_components/_sidebar-component/Sidebar";
+import PinForm from "@/app/_components/PinForm";
+import { usePinStore } from "@/stores/pinStore";
+
+const MapView = dynamic(() => import("@/app/_components/_map-component/MapView"), {
+  ssr: false,
+});
 
 export default function HomePage() {
   const router = useRouter();
   const mapRef = useRef<any>(null);
 
-  const { user, pins = [], categories = [], setPins, setCategories, loading } =
-    useAuthStore();
+  const { user, initialized, bootstrapUser } = useCurrentUserStore();
+  const categories = useCategoryStore((s) => s.categories);
+  const fetchCategories = useCategoryStore((s) => s.fetchCategories);
+  const pins = usePinStore((s) => s.pins);
+  const fetchPins = usePinStore((s) => s.fetchPins);
 
-  const [selectedPin, setSelectedPin] = useState<pin | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [formData, setFormData] = useState<pin | null>(null);
-  const [filter, setFilter] = useState("All");
-
-  const [walkthroughOpen, setWalkthroughOpen] = useState(false);
+  const [formData, setFormData] = useState<any>(null);
 
   useEffect(() => {
-    if (user && pins.length === 0 && categories.length === 0) {
-      setWalkthroughOpen(true);
-    }
-  }, []);
+    if (!initialized) bootstrapUser();
+  }, [initialized, bootstrapUser]);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
+    if (initialized && !user) router.replace("/login");
+  }, [initialized, user, router]);
+
+  const filter = "All";
+  const visiblePins = Array.isArray(pins)
+    ? filter === "All"
+      ? pins
+      : pins.filter((p) => p.category === filter)
+    : [];
+
+  useEffect(() => {
+    if (initialized && user) {
+      fetchCategories(user.email);
+      fetchPins(user.email);
     }
-  }, [loading, user, router]);
+  }, [initialized, user, fetchCategories, fetchPins]);
 
-  if (loading || !user) return null;
+  if (!initialized) return null;
+  
+  const handleMapClick = (lat: number, lng: number) => {
+    if (categories.length === 0) {
+      showError("Please create at least one category from the sidebar first!");
+      return;
+    }
 
-  const visiblePins =
-    filter === "All" ? pins : pins.filter((p) => p.category === filter);
-
-  const savePin = (p: pin) => {
-    const final = buildPin(p, categories, user.email);
-    if (!final) return showError("Select valid category");
-
-    setPins(
-      pins.some((x) => x.id === p.id)
-        ? pins.map((x) => (x.id === p.id ? final : x))
-        : [...pins, final]
-    );
-
-    setFormOpen(false);
-    setFormData(null);
+    setFormData({
+      id: Date.now().toString(),
+      name: "",
+      description: "",
+      lat,
+      lng,
+      category: categories[0].name,
+      userId: user?.email || "",
+    });
+    setFormOpen(true);
   };
 
   return (
-    <div className="app relative">
-      <Sidebar
-        pins={visiblePins}
-        selectedPin={selectedPin}
-        onSelectPin={setSelectedPin}
-        onDeletePin={(id) => setPins(pins.filter((p) => p.id !== id))}
-        onEditPin={(p) => {
-          setFormData(p);
-          setFormOpen(true);
-        }}
-        filter={filter}
-        setFilter={setFilter}
-        categories={categories}
-        onAddCategory={(c) =>
-          setCategories([...categories, { ...c, userId: user.email }])
-        }
-        onDeleteCategory={(names) =>
-          setCategories(categories.filter((c) => !names.includes(c.name)))
-        }
-        mapRef={mapRef}
-        username={user.username}
-      />
+    <div className="app relative min-h-screen bg-zinc-900 text-white">
+    <Sidebar mapRef={mapRef} />
 
       <MapView
-        pins={visiblePins}
+        pins={pins}
         mapRef={mapRef}
-        onSelectPin={setSelectedPin}
-        onMapClick={(lat, lng) => {
-          if (!categories.length) return showError("Create category first");
-
-          setFormData({
-            id: Date.now().toString(),
-            name: "",
-            description: "",
-            lat,
-            lng,
-            category: categories[0].name,
-            color: categories[0].color,
-            userId: user.email,
-          });
-          setFormOpen(true);
-        }}
-        openWalkthrough={() => setWalkthroughOpen(true)}
+        onMapClick={handleMapClick}
+        onSelectPin={() => {}}
+        openWalkthrough={() => {}}
       />
-
-      {walkthroughOpen && (
-        <WalkthroughModal
-          key={walkthroughOpen ? "open" : "closed"}
-          onClose={() => setWalkthroughOpen(false)}
-        />
-      )}
-
-      {selectedPin && <PinModal pin={selectedPin} onClose={() => setSelectedPin(null)} />}
 
       {formOpen && formData && (
         <PinForm
           pin={formData}
           categories={categories}
-          onSave={savePin}
-          onClose={() => setFormOpen(false)}
+          onSave={async (pin: any) => {
+            setFormOpen(false);
+            setFormData(null);
+            usePinStore.setState({ pinForm: pin });
+            await usePinStore.getState().savePin();
+          }}
+          onClose={() => {
+            setFormOpen(false);
+            setFormData(null);
+          }}
         />
       )}
     </div>

@@ -9,10 +9,12 @@ import { simplePin } from "@/app/_components/_map-component/map-icons";
 export default function PinMarker({pin,onSelectPin}: PinMarkerProps) {
   const map = useMap();
 
+  const color = pin.color || "#22c55e";
+
   return (
     <Marker
       position={[pin.lat, pin.lng]}
-      icon={simplePin(pin.color)}
+      icon={simplePin(color)}
       eventHandlers={{
         click: () => {
           onSelectPin(pin);

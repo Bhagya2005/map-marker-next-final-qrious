@@ -17,6 +17,7 @@ export default function UserSettingsModal({currentEmail,onSave,onClose}: UserSet
   const [email, setEmail] = useState(currentEmail ?? "");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [defaultPrivacy, setDefaultPrivacy] = useState("public");
   const [loading, setLoading] = useState(false);
 
  const handleSave = async () => {
@@ -54,45 +55,86 @@ export default function UserSettingsModal({currentEmail,onSave,onClose}: UserSet
 
   return (
     <div className="fixed inset-0 z-[20000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-md bg-zinc-900 rounded-3xl p-6 shadow-2xl flex flex-col gap-4">
-        <button
-          onClick={onClose}
-          disabled={loading}
-          className="absolute top-4 right-4 text-xl font-bold text-white hover:text-red-500"
-        >
-          ✕
-        </button>
-        <h2 className="text-xl font-bold text-white">User Settings</h2>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="w-full rounded-xl px-3 py-2 bg-zinc-800 text-white border border-gray-600 shadow-sm focus:ring-2 focus:ring-indigo-400 transition"
-          disabled={loading}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-xl px-3 py-2 bg-zinc-800 text-white border border-gray-600 shadow-sm focus:ring-2 focus:ring-indigo-400 transition"
-          disabled={loading}
-        />
-        <input
-          type="password"
-          placeholder="New Password (optional)"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-xl px-3 py-2 bg-zinc-800 text-white border border-gray-600 shadow-sm focus:ring-2 focus:ring-indigo-400 transition"
-          disabled={loading}
-        />
+      <div className="relative w-full max-w-md bg-gradient-to-br from-zinc-800 via-zinc-900 to-black rounded-2xl p-7 shadow-2xl border border-white/10 flex flex-col gap-5">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+             Settings
+          </h2>
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="text-2xl font-bold text-gray-400 hover:text-white transition"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
+            👤 Username (optional)
+          </label>
+          <input
+            type="text"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full rounded-lg px-4 py-3 bg-zinc-800/50 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition disabled:opacity-50"
+            disabled={loading}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
+             Email
+          </label>
+          <input
+            type="email"
+            placeholder="your@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-lg px-4 py-3 bg-zinc-800/50 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition disabled:opacity-50"
+            disabled={loading}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
+             New Password (optional)
+          </label>
+          <input
+            type="password"
+            placeholder="Leave empty to keep current"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-lg px-4 py-3 bg-zinc-800/50 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition disabled:opacity-50"
+            disabled={loading}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-300 mb-2">
+             Default Pin Privacy
+          </label>
+          <select
+            value={defaultPrivacy}
+            onChange={(e) => setDefaultPrivacy(e.target.value)}
+            className="w-full rounded-lg px-4 py-3 bg-zinc-800/50 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition disabled:opacity-50"
+            disabled={loading}
+          >
+            <option value="public">Public - Visible to everyone</option>
+            <option value="private">Private - Only me</option>
+          </select>
+          <p className="text-xs text-gray-400 mt-1">
+            This setting controls the default privacy for new pins
+          </p>
+        </div>
+
         <button
           onClick={handleSave}
           disabled={loading}
-          className="bg-indigo-600 text-white py-2 rounded-2xl shadow-lg hover:scale-105 transition transform disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? "Saving..." : "Save"}
+          {loading ? " Saving..." : "Save Settings"}
         </button>
       </div>
     </div>

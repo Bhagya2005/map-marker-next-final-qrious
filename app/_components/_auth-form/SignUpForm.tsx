@@ -1,22 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useSignUp } from "@/hooks/use-signup";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/stores/authStore"; 
+import { showError } from "@/utils/toast";
 
 export default function SignUpForm() {
-  const {
-    username,
-    setUsername,
-    email,
-    setEmail,
-    password,
-    setPassword,
-    confirmPassword,
-    setConfirmPassword,
-    role,
-    setRole,
-    handleSignUp,
-  } = useSignUp();
+  const router = useRouter();
+
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<"admin" | "regular">("regular");
+
+  const signup = useAuthStore((s) => s.signup);
+
+  const handleSignUp = async () => {
+    if (password !== confirmPassword) {
+      return showError("Passwords do not match");
+    }
+
+    signup({ username, email, password, role }, router);
+  };
 
   return (
     <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md p-8 md:p-10 transition-all hover:border-white/20">
@@ -118,7 +125,10 @@ export default function SignUpForm() {
       <div className="mt-8 text-center">
         <p className="text-sm text-gray-400">
           Already have an account?{" "}
-          <Link href="/login" className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors">
+          <Link
+            href="/login"
+            className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors"
+          >
             Sign In
           </Link>
         </p>

@@ -1,22 +1,15 @@
-"use client";
-
 import "./globals.css";
-import { useEffect } from "react"; 
 import { ThemeProvider } from "./_components/theme-context";
 import { Toaster } from "react-hot-toast";
-import { useAuthStore } from "@/store/useAuthStore";
+import React from "react";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    useAuthStore.getState().bootstrapUser(); 
-  }, []);
-
   return (
     <html lang="en">
       <body>
         <ThemeProvider>
+          <Toaster />
           {children}
-          <Toaster position="top-right" reverseOrder={false} />
         </ThemeProvider>
       </body>
     </html>

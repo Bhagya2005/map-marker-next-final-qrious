@@ -1,6 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Feedback from "@/lib/models/Feedback";
+import { withCORS, handleCORSPreflight } from "@/lib/cors";
+
+export async function OPTIONS(req: NextRequest) {
+  return handleCORSPreflight();
+}
 
 export async function GET(req: Request) {
   await dbConnect();
@@ -12,7 +17,6 @@ export async function GET(req: Request) {
   const category = searchParams.get("category") || "";
   const status = searchParams.get("status") || "";
 
-  // Dynamic MongoDB Query
   const query: any = {};
   if (search) {
     query.$or = [
@@ -32,18 +36,23 @@ export async function GET(req: Request) {
 
     const total = await Feedback.countDocuments(query);
 
-    // Stats for Charts (Sab feedbacks fetch karne ke bajaye aggregate use karein)
     const stats = await Feedback.aggregate([
       { $group: { _id: "$status", count: { $sum: 1 } } }
     ]);
 
-    return NextResponse.json({
-      feedbacks,
-      totalPages: Math.ceil(total / limit),
-      totalItems: total,
-      stats
-    });
+    return withCORS(
+      NextResponse.json({
+        feedbacks,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        stats
+      }),
+      req as NextRequest
+    );
   } catch (err) {
-    return NextResponse.json({ error: "Fetch failed" }, { status: 500 });
+    return withCORS(
+      NextResponse.json({ error: "Fetch failed" }, { status: 500 }),
+      req as NextRequest
+    );
   }
 }

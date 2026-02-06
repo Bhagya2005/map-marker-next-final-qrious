@@ -2,21 +2,30 @@
 
 import { useState } from "react";
 import { FeedbackModalProps } from "@/app/types";
+import { showError, showSuccess } from "@/utils/toast";
 
 export default function FeedbackModal({ onClose, onSubmit }: FeedbackModalProps) {
-  const [rating, setRating] = useState<number>(0);
-  const [hoverRating, setHoverRating] = useState<number>(0);
-  const [title, setTitle] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
-  const [category, setCategory] = useState<string>("other");
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+  const [category, setCategory] =
+    useState<"bug" | "feature" | "improvement" | "other">("other");
 
   const handleSubmit = () => {
     if (!title.trim()) {
-      alert("Please enter a title");
+      showError("Feedback title is required");
       return;
     }
 
-    onSubmit(rating || 0, message);
+    onSubmit({
+      title,
+      message,
+      rating,
+      category,
+    });
+
+    showSuccess("Feedback submitted");
     onClose();
   };
 
@@ -42,7 +51,9 @@ export default function FeedbackModal({ onClose, onSubmit }: FeedbackModalProps)
 
         <select
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          onChange={(e) =>
+            setCategory(e.target.value as typeof category)
+          }
           className="w-full rounded-xl px-3 py-2 bg-zinc-800 text-white border border-gray-600"
         >
           <option value="bug">Bug Report</option>
@@ -53,9 +64,10 @@ export default function FeedbackModal({ onClose, onSubmit }: FeedbackModalProps)
 
         <div className="flex gap-2">
           {[1, 2, 3, 4, 5].map((star) => {
-            const active = hoverRating
-              ? hoverRating >= star
-              : rating >= star;
+            const active =
+              hoverRating > 0
+                ? hoverRating >= star
+                : rating >= star;
 
             return (
               <button

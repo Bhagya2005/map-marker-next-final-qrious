@@ -1,13 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { useLogin } from "@/hooks/use-login";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function LoginForm() {
-  const {mounted,email,setEmail,password,setPassword,role,setRole,handleLogin} = useLogin();
+  const router = useRouter();
+
+  const [mounted, setMounted] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"admin" | "regular">("regular");
+
+  const login = useAuthStore((s) => s.login);
+  const user = useAuthStore((s) => s.user);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      router.replace(user.role === "admin" ? "/admin/dashboard" : "/");
+    }
+  }, [user, router]);
 
   if (!mounted) return null;
-
   return (
     <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full max-w-md p-8 md:p-10 transition-all hover:border-white/20">
       <div className="mb-8">
@@ -75,8 +94,8 @@ export default function LoginForm() {
 
         <button
           type="button"
-          onClick={handleLogin}
-          className="w-full text-white p-4 rounded-2xl font-bold  shadow-xl shadow-blue-300/20 transition-all active:scale-[0.98] mt-4 cursor-pointer"
+          onClick={() => login(email, password)}
+          className="w-full text-white p-4 rounded-2xl font-bold shadow-xl shadow-blue-300/20 transition-all active:scale-[0.98] mt-4 cursor-pointer"
         >
           Sign In
         </button>
@@ -85,13 +104,19 @@ export default function LoginForm() {
       <div className="mt-8 space-y-3 text-center">
         <p className="text-sm text-gray-400">
           New user?{" "}
-          <Link href="/sign-up" className="text-blue-400 hover:text-blue-300 font-semibold transition-colors">
+          <Link
+            href="/sign-up"
+            className="text-blue-400 hover:text-blue-300 font-semibold transition-colors"
+          >
             Create Account
           </Link>
         </p>
         <p className="text-sm text-gray-400">
           Forgot your password?{" "}
-          <Link href="/forgot-password" className="text-gray-100 hover:text-white font-semibold transition-colors">
+          <Link
+            href="/forgot-password"
+            className="text-gray-100 hover:text-white font-semibold transition-colors"
+          >
             Reset here
           </Link>
         </p>

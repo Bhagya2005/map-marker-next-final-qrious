@@ -46,6 +46,22 @@ export default function PinModal({ pin, onClose }: PinModalProps) {
             <p className="text-sm opacity-80 whitespace-pre-wrap break-words">{pin.description}</p>
           )}
 
+          {pin.images && pin.images.length > 0 && (
+            <div className="space-y-2">
+              <p className="font-semibold text-sm">Photos:</p>
+              <div className="flex flex-wrap gap-2">
+                {pin.images.map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={`pin-${idx}`}
+                    className="w-24 h-24 object-cover rounded-lg border border-white/20"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-semibold text-xs">Category:</span>
             <span

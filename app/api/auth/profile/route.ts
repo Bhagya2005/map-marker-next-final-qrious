@@ -2,15 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import User from '@/lib/models/User';
 import { authenticateRequest } from '@/lib/middleware/auth';
+import { withCORS, handleCORSPreflight } from '@/lib/cors';
+
+export async function OPTIONS(req: NextRequest) {
+  return handleCORSPreflight();
+}
 
 export async function GET(req: NextRequest) {
   try {
     const auth = authenticateRequest(req);
 
     if (!auth.authenticated || !auth.user) {
-      return NextResponse.json(
-        { message: auth.error || 'Unauthorized' },
-        { status: 401 }
+      return withCORS(
+        NextResponse.json(
+          { message: auth.error || 'Unauthorized' },
+          { status: 401 }
+        ),
+        req
       );
     }
 
@@ -18,17 +26,23 @@ export async function GET(req: NextRequest) {
     const user = await User.findById((auth.user as any).id).select('-password');
 
     if (!user) {
-      return NextResponse.json(
-        { message: 'User not found' },
-        { status: 404 }
+      return withCORS(
+        NextResponse.json(
+          { message: 'User not found' },
+          { status: 404 }
+        ),
+        req
       );
     }
 
-    return NextResponse.json(user);
+    return withCORS(NextResponse.json(user), req);
   } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || 'Failed to fetch profile' },
-      { status: 500 }
+    return withCORS(
+      NextResponse.json(
+        { message: error.message || 'Failed to fetch profile' },
+        { status: 500 }
+      ),
+      req
     );
   }
 }
@@ -38,9 +52,12 @@ export async function PUT(req: NextRequest) {
     const auth = authenticateRequest(req);
 
     if (!auth.authenticated || !auth.user) {
-      return NextResponse.json(
-        { message: auth.error || 'Unauthorized' },
-        { status: 401 }
+      return withCORS(
+        NextResponse.json(
+          { message: auth.error || 'Unauthorized' },
+          { status: 401 }
+        ),
+        req
       );
     }
 
@@ -49,9 +66,12 @@ export async function PUT(req: NextRequest) {
     const user = await User.findById((auth.user as any).id);
 
     if (!user) {
-      return NextResponse.json(
-        { message: 'User not found' },
-        { status: 404 }
+      return withCORS(
+        NextResponse.json(
+          { message: 'User not found' },
+          { status: 404 }
+        ),
+        req
       );
     }
 
@@ -60,19 +80,25 @@ export async function PUT(req: NextRequest) {
 
     await user.save();
 
-    return NextResponse.json({
-      message: 'Profile updated successfully',
-      user: {
-        id: user._id,
-        email: user.email,
-        username: user.username,
-        role: user.role,
-      },
-    });
+    return withCORS(
+      NextResponse.json({
+        message: 'Profile updated successfully',
+        user: {
+          id: user._id,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+        },
+      }),
+      req
+    );
   } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || 'Failed to update profile' },
-      { status: 500 }
+    return withCORS(
+      NextResponse.json(
+        { message: error.message || 'Failed to update profile' },
+        { status: 500 }
+      ),
+      req
     );
   }
 }

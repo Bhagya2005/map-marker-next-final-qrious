@@ -1,6 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import User from "@/lib/models/User";
+import { withCORS, handleCORSPreflight } from "@/lib/cors";
+
+export async function OPTIONS(req: NextRequest) {
+  return handleCORSPreflight();
+}
 
 export async function GET(req: Request) {
   await dbConnect();
@@ -11,7 +16,6 @@ export async function GET(req: Request) {
   const search = searchParams.get("search") || "";
   const role = searchParams.get("role") || "";
 
-  // Dynamic Query
   const query: any = {};
   if (search) {
     query.$or = [
@@ -24,20 +28,26 @@ export async function GET(req: Request) {
   try {
     const skip = (page - 1) * limit;
     const users = await User.find(query)
-      .select("+password") // Password field agar hidden ho to
+      .select("+password")
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
 
     const total = await User.countDocuments(query);
 
-    return NextResponse.json({
-      users,
-      totalPages: Math.ceil(total / limit),
-      totalItems: total
-    });
+    return withCORS(
+      NextResponse.json({
+        users,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total
+      }),
+      req as NextRequest
+    );
   } catch (error) {
-    return NextResponse.json({ error: "Fetch failed" }, { status: 500 });
+    return withCORS(
+      NextResponse.json({ error: "Fetch failed" }, { status: 500 }),
+      req as NextRequest
+    );
   }
 }
 
@@ -46,8 +56,14 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const user = await User.create(body);
-    return NextResponse.json(user, { status: 201 });
+    return withCORS(
+      NextResponse.json(user, { status: 201 }),
+      req as NextRequest
+    );
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
+    return withCORS(
+      NextResponse.json({ error: err.message }, { status: 400 }),
+      req as NextRequest
+    );
   }
 }
